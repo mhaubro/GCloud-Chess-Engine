@@ -40,6 +40,8 @@ jobs:
     # e.g. x64-osx).
     # VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
 
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -84,12 +86,9 @@ jobs:
           copy LICENSE release &&
           copy README.md release &&
           compress-archive release -Destinationpath release.zip
+      - uses: actions/checkout@v4
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "release.zip"
 
-    permissions:
-      contents: write
-    steps:
-    - uses: actions/checkout@v4
-    - uses: ncipollo/release-action@v1
-      with:
-        artifacts: "release.zip"
 
