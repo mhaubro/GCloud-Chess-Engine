@@ -86,9 +86,8 @@ jobs:
           copy LICENSE release &&
           copy README.md release &&
           compress-archive release -Destinationpath release.zip
-      - uses: actions/checkout@v4
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "release.zip"
+          artifacts: release.zip
 
 
