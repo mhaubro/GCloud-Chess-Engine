@@ -62,6 +62,16 @@ jobs:
         uses: lukka/run-cmake@v10
         with:
           configurePreset: 'vcpkg'
+      # GitHub Actions example:
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: msvc
+          vcvarsall: true
+          cmake: true
+          ninja: true
+          vcpkg: true
+      #Creating release folder
       - name: Create release-folder
         run: 
           cmake --build build &&
