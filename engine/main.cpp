@@ -12,7 +12,6 @@ using namespace std;
 int main()
 {
     int status;
-    log_output("Reading engine config\n");
     engine_read_configuration();
 
     log_output("Starting command listener\n");

@@ -10,10 +10,10 @@ void engine_get_machine_data();
 class engine_configuration {
     protected:
     public:
-        string instance_name; // Instance name in gCloud, same name as folder executable is run from
+        string instance_name; // Instance name in gCloud. Default: the folder name containing the executable if not set.
         string executable_path; // Executable path in remote engine
-        int hash; // Hash size
-        int cpus; // Cpus
+        int hash; // Mb, Default: Machine memory size subtracted 4GB for OS if not set.
+        int cpus; // Cores, Default: Machine CPUs if not set
         string uci_output; // Full output for uci command
 };
 

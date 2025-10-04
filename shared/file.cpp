@@ -7,6 +7,7 @@
 mutex logfile_mutex;
 
 string os_get_path_to_executable();
+bool logging_enabled = false; // Set when engine configuration is read
 
 // Useful for file loads
 string file_get_parent_folder_path() {
@@ -19,6 +20,9 @@ string file_get_parent_folder_name() {
 }
 
 void log_output(string data) {
+    if (!logging_enabled) {
+        return;
+    }
     ofstream logfile;
     logfile_mutex.lock();
     logfile.open (file_get_parent_folder_path() + os_path_separator + "log.txt", ios_base::app);
