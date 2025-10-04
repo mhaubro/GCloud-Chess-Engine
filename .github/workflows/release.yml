@@ -1,0 +1,93 @@
+# Copyright (c) 2021-2022-2023-2024 Luca Cappa
+# Released under the term specified in file LICENSE.txt
+# SPDX short identifier: MIT
+#
+# The peculiarity of this workflow is that assumes vcpkg stored as a submodule of this repository.
+# The workflow runs on x64 and ARM platforms.
+# Workflow steps:
+# - Setup vcpkg and cache it on the GitHub Action cloud based cache.
+# - Runs CMake with CMakePreset.json using a presest configuration
+#   that leverages the vcpkg's toolchain file. This will automatically run vcpkg
+#   to install dependencies described by the vcpkg.json manifest file.
+#   This stage also runs vcpkg with Binary Caching leveraging GitHub Action cache to
+#   store the built packages artifacts, hence it will be a no-op if those are restored
+#   from cache (e.g., already previously built).
+# - Finally builds the sources with Ninja, and tests as well.
+name: Release Binaries
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Beneath is same as on a "Regression", but including the publishing of released binaries
+jobs:
+  job:
+    name: ${{ matrix.os }}-${{ github.workflow }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022]
+        include:
+          - os: "windows-2022"
+            compiler: "msvc"
+    #env:
+    #
+    # [OPTIONAL] Define the vcpkg's triplet
+    # you want to enforce, otherwise the default one
+    # for the hosting system will be automatically
+    # choosen (x64 is the default on all platforms,
+    # e.g. x64-osx).
+    # VCPKG_DEFAULT_TRIPLET: ${{ matrix.triplet }}
+
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: lukka/get-cmake@latest
+
+      - name: Restore from cache and setup vcpkg executable and data files.
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: 'vcpkg.json'
+
+      # Note: if the preset misses the "configuration", it is possible to explicitly select the
+      # configuration with the additional `--config` flag, e.g.:
+      #   buildPreset: 'ninja-vcpkg'
+      #   buildPresetAdditionalArgs: "[`--config`, `Release`]"
+      #   testPreset: 'ninja-vcpkg'
+      #   testPresetAdditionalArgs: "[`--config`, `Release`]"
+      - name: Run CMake+vcpkg+Ninja to build.
+        uses: lukka/run-cmake@v10
+        with:
+          configurePreset: 'vcpkg'
+      # GitHub Actions example:
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1
+        with:
+          compiler: msvc
+          vcvarsall: true
+          cmake: true
+          ninja: true
+          vcpkg: true
+      #Creating release folder
+      - name: Create release-folder
+        run: 
+          cmake --build build &&
+          mkdir release &&
+          copy build\gcloud_engine.exe release &&
+          copy build\ssh.dll release &&
+          copy build\yaml-cppd.dll release &&
+          copy build\libcrypto-3-x64.dll release &&
+          copy foss_engines.yml release &&
+          copy LICENSE release &&
+          copy README.md release &&
+          compress-archive release -Destinationpath release.zip
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: release.zip
+
+
