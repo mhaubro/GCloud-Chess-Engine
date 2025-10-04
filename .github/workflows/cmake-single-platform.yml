@@ -61,6 +61,7 @@ jobs:
           configurePreset: 'vcpkg'
       - name: Create release-folder
         run: 
+          cmake --build build &&
           mkdir release &&
           copy /y /b build\gcloud_engine.exe release &&
           copy /y /b build\ssh.dll release &&
