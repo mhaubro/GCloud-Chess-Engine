@@ -61,15 +61,14 @@ jobs:
           configurePreset: 'vcpkg'
       - name: Create release-folder
         run: 
-          mkdir release
-          copy /y /b build\gcloud_engine.exe release
-          copy /y /b build\ssh.dll release
-          copy /y /b build\yaml-cpp.dll release
-          copy /y /b build\libcrypto-3.dll release
-          copy /y /b foss_engines.yml release
-          copy /y /b LICENSE release
-          copy /y /b README.md release
-          mkdir release
+          mkdir release &&
+          copy /y /b build\gcloud_engine.exe release &&
+          copy /y /b build\ssh.dll release &&
+          copy /y /b build\yaml-cpp.dll release &&
+          copy /y /b build\libcrypto-3.dll release &&
+          copy /y /b foss_engines.yml release &&
+          copy /y /b LICENSE release &&
+          copy /y /b README.md release &&
 
       - name: Use the Upload Artifact GitHub Action
         uses: actions/upload-artifact@v4
