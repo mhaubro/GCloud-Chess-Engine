@@ -31,7 +31,7 @@ void Engineconfig::setup_remote_engine() {
     ssh_connection_start();
     // Will block until done
     cout << "Executing " << to_string(setup_commands.size()) << " setup commands" << endl;
-    for (int i = 0; i < setup_commands.size(); i++) {
+    for (unsigned int i = 0; i < setup_commands.size(); i++) {
         cout << "Executing setup command " << to_string(i + 1) << endl;
         string output = gcloud_execute_command(setup_commands[i]);
         if (output.find("reboot") != string::npos) {
@@ -44,7 +44,7 @@ void Engineconfig::setup_remote_engine() {
     }
     if (neural_nets.size() > 0) {
         gcloud_execute_command("cd ~"); // Ensure location is home directory
-        for (int i = 0; i < neural_nets.size(); i++) {
+        for (unsigned int i = 0; i < neural_nets.size(); i++) {
             cout << "Downloading neural network " << to_string(i) << " out of " << to_string(neural_nets.size()) << " in total" << endl;
             gcloud_execute_command("wget " + neural_nets[i]);
         }
@@ -111,11 +111,11 @@ string Engineconfig::toString() {
     string s = "Name: " + engine_name + "\n";
     s += "Executable: " + executable_path + "\n";
     s += "Setup commands:\n";
-    for (int i = 0; i < setup_commands.size(); i++) {
+    for (unsigned int i = 0; i < setup_commands.size(); i++) {
         s += setup_commands[i] + "\n";
     }
     s += "neural nets:\n";
-    for (int i = 0; i < neural_nets.size(); i++) {
+    for (unsigned int i = 0; i < neural_nets.size(); i++) {
         s += neural_nets[i] + "\n";
     }
     return s;
