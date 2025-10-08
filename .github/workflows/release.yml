@@ -79,6 +79,7 @@ jobs:
           cmake --build build &&
           mkdir release &&
           copy build\gcloud_engine.exe release &&
+          copy build\gcloud_config.exe release &&
           copy build\ssh.dll release &&
           copy build\yaml-cppd.dll release &&
           copy build\libcrypto-3-x64.dll release &&
