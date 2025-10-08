@@ -1,7 +1,6 @@
 {
   "dependencies": [
     "yaml-cpp",
-    "libssh",
-    "gtest"
+    "libssh"
   ]
 }
