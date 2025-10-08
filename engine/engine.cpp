@@ -2,6 +2,7 @@
 #include <list>
 #include <thread>
 #include <mutex>
+#include <semaphore>
 
 #include "shared.h"
 #include "configuration.h"
@@ -11,7 +12,18 @@ mutex uci_commands_mutex;
 list<string> uci_commands_incoming;
 string setoption_hash_string = "setoption name Hash value ";
 string setoption_threads_string = "setoption name Threads value ";
+extern bool quit_received;
+extern binary_semaphore command_received;
+bool main_thread_signaled = false;
 
+// Used as the main thread does not want to start a gcloud instance when
+// a user is only checking the parameters. So a 'uci' or 'quit' command
+// doesn't cause the VM to start, creating for a better user experience.
+void signal_main_thread() {
+    if (!main_thread_signaled) {
+        command_received.release();
+    }
+}
 
 // Thread to be started on program boot. Will always listen to cin, and
 // Reply to the commands 'uci' and 'readyok' immediately.
@@ -29,14 +41,18 @@ void engine_command_listener() {
         } else if (line.compare(0, string("isready").length(), string("isready")) == 0) {
             log_output("Outputting on cout: readyok\n");
             cout << "readyok" << endl;
+            signal_main_thread();
+        } else if (line.compare(0, string("quit").length(), string("quit")) == 0) {
+            quit_received = true;
+            uci_commands_mutex.unlock();
+            signal_main_thread();
+            return;
         } else {
             // Add command to command list
+            signal_main_thread();
             uci_commands_incoming.push_back(line);
         }
         uci_commands_mutex.unlock();
-        if (line.compare("quit") == 0) {
-            return;
-        }
     }
 }
 
