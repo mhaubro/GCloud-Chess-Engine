@@ -15,9 +15,9 @@ char ssh_incoming_buffer[512*1024];
 
 // Setting up session according to https://api.libssh.org/stable/libssh_tutor_guided_tour.html
 // Assumes that gcloud machine is online -> that gcloud_instance_start has been called beforehand
-int ssh_connection_start(string instance) {
+int ssh_connection_start() {
     ssh_init();
-    gcloud_execute_dummy_command(instance);
+    gcloud_execute_dummy_command();
     int status;
     session = ssh_new();
     if (session == NULL) {
@@ -25,8 +25,7 @@ int ssh_connection_start(string instance) {
         return -1;
     }
     // Get the IP Address of the remote machine.
-    string ip_address = gcloud_get_ip_address(instance);
-    log_output("IP Address read from gcloud: " + ip_address);
+    string ip_address = gcloud_get_ip_address();
     // Pop-back CR and newline for SSHLIB to be able to handle the string
     ip_address.pop_back();
     ip_address.pop_back();
@@ -92,15 +91,6 @@ int ssh_connection_start(string instance) {
     }
     // Discard the boot-text
     ssh_read();
-    // Get the machine data before starting stockfish.
-    engine_get_machine_data();
-
-    string command = engine_configuration_global.executable_path;
-    status = ssh_channel_write(channel, command.c_str(), strlen(command.c_str()));
-    if (status == SSH_ERROR) {
-        log_output("Error when writing to ssh channel\n");
-        return SSH_ERROR;
-    }
     return SSH_OK;
 }
 
@@ -113,8 +103,21 @@ void ssh_connection_terminate() {
 }
 
 void ssh_write(string data) {
-    ssh_channel_write(channel, data.c_str(), strlen(data.c_str()));
-    log_output("Writing to remote: " + data);
+    int bytes = ssh_channel_write(channel, data.c_str(), strlen(data.c_str()));
+    log_output("Writing to remote, data: " + data);
+}
+
+string ssh_read_blocking() {
+    int bytes;
+    bytes = ssh_channel_read(channel, ssh_incoming_buffer, sizeof(ssh_incoming_buffer), false);
+    if (bytes > 0) {
+        ssh_incoming_buffer[bytes] = '\0';
+        log_output("Read from remote: " + string(ssh_incoming_buffer));
+        return string(ssh_incoming_buffer);
+    } else {
+        log_output("SSH READ OUTPUT: " + to_string(bytes));
+        return string("");
+    }
 }
 
 string ssh_read() {

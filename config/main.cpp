@@ -1,12 +1,6 @@
-#include <iostream>
-#include <vector>
-#include <string>
-
-#include "shared.h"
-
-using namespace std;
+#include "config.h"
 
 int main()
 {
-
+    create_engine();
 }

@@ -38,6 +38,13 @@ void engine_read_configuration() {
         log_output("uci_output not found\n");
         throw "";
     }
+    if (config["zone"]) {
+        engine_configuration_global.zone = config["zone"].as<string>();
+        log_output("zone: " + engine_configuration_global.executable_path + "\n");
+    } else {
+        log_output("zone not found\n");
+        throw "";
+    }
     // Non-mandatory fields
     if (config["instance_name"]) {
         engine_configuration_global.uci_output = config["uci_output"].as<string>();
@@ -64,16 +71,22 @@ void engine_get_machine_data() {
     if (engine_configuration_global.cpus == 0) {
         ssh_write("nproc --all\n");
         sleep_ms(200);
+        // Reserve 2 CPU cores for OS, ssh etc to not bog down the remote engine
         engine_configuration_global.cpus = stoi(ssh_read());
+        if (engine_configuration_global.cpus > 2) {
+            engine_configuration_global.cpus -= 2;
+        } else {
+            engine_configuration_global.cpus = 1;
+        }
     }
     
     if (engine_configuration_global.hash == 0) {
         ssh_write("awk '/MemTotal/{print $2}' /proc/meminfo\n");
         sleep_ms(200);
         engine_configuration_global.hash = stoi(ssh_read()) / 1024;
-        // Reserve 4gb or half of total memory to OS, depending on what is smaller
-        if (engine_configuration_global.hash > 8192) {
-            engine_configuration_global.hash -= 4096;
+        // Reserve 8gb or half of total memory to OS, depending on what is smaller
+        if (engine_configuration_global.hash > 16384) {
+            engine_configuration_global.hash -= 8192;
         } else {
             engine_configuration_global.hash /= 2;
         }

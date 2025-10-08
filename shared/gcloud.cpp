@@ -4,23 +4,32 @@
 
 using namespace std;
 
-string os_execute_local_shell_command(string cmd);
 extern string gcloud_command_name;
+string instance;
+string zone;
 
-int gcloud_instance_start(string instance) {
-    os_execute_local_shell_command(gcloud_command_name + " compute instances start " + instance);
-    return 0; // TODO: Add better debug options
+void gcloud_cache_settings(string gcloud_instance, string gcloud_zone) {
+    instance = gcloud_instance;
+    zone = gcloud_zone;
 }
 
-void gcloud_terminate_instance(string instance) {
-    // os_execute_local_shell_command(gcloud_command_name + " compute instances stop " + instance + " --async");
+string gcloud_instance_start() {
+    return os_execute_local_shell_command(gcloud_command_name + " compute instances start " + instance + " --zone=" + zone);
 }
 
-string gcloud_get_ip_address(string instance) {
-	return os_execute_local_shell_command(gcloud_command_name + " compute instances describe " + instance + " --format=get(networkInterfaces[0].accessConfigs.natIP)");
+string gcloud_terminate_instance() {
+    return os_execute_local_shell_command(gcloud_command_name + " compute instances stop " + instance + " --zone=" + zone + " --async");
+}
+
+string gcloud_get_ip_address() {
+	return os_execute_local_shell_command(gcloud_command_name + " compute instances describe " + instance + " --zone=" + zone + " --format=get(networkInterfaces[0].accessConfigs.natIP)");
+}
+
+string gcloud_execute_command(string command) {
+    return os_execute_local_shell_command(gcloud_command_name + " compute ssh " + instance + " --zone=" + zone + " --command=\"" + command + "\"");
 }
 
 // This will ensure that an up-to-date ssh-key is present in the users .ssh-directory, eliminating needs to rely on user keys
-void gcloud_execute_dummy_command(string instance) {
-    os_execute_local_shell_command(gcloud_command_name + " compute ssh " + instance + " --command=\"ls\"");
+string gcloud_execute_dummy_command() {
+    return gcloud_execute_command("ls");
 }

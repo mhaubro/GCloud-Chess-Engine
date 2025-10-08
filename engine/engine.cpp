@@ -18,17 +18,16 @@ string setoption_threads_string = "setoption name Threads value ";
 // Will put all commands in a list, which can then be consumed by the engine
 // once it's up and running. Since cin is a buffer, this thread is necessary.
 void engine_command_listener() {
-    // Initial chessbase trickery, making it think all is ok
     for (string line; getline(cin, line);) {
         log_output("Incoming on cin: " + string(line) + "\n");
         uci_commands_mutex.lock(); // Controls both the list and access to cout.
 
         // If it's a "uci" or "isready", it is not added to command list, instead reply is immediate
         if (line.compare(0, string("uci").length(), string("uci")) == 0) {
-            log_output("Outputting on cin: " + engine_configuration_global.uci_output + "\n");
+            log_output("Outputting on cout: " + engine_configuration_global.uci_output + "\n");
             cout << engine_configuration_global.uci_output << endl;
         } else if (line.compare(0, string("isready").length(), string("isready")) == 0) {
-            log_output("Outputting on cin: readyok\n");
+            log_output("Outputting on cout: readyok\n");
             cout << "readyok" << endl;
         } else {
             // Add command to command list
@@ -55,6 +54,9 @@ static bool send_all_commands() {
         if (command.compare(0, setoption_threads_string.length(), setoption_threads_string) == 0) { // Necessary to overwrite the hash value from CB
             command = setoption_threads_string + to_string(engine_configuration_global.cpus);
         }
+        if (command.find("RamLimitMb") != string::npos) { // Ram limit mb is written automatically during startup
+            continue;
+        }
 
         // Incoming data on cin does not contain newlines that are needed for terminal activation on remote
         command.push_back('\n');
@@ -73,6 +75,17 @@ static bool send_all_commands() {
 // Will write whenever a new command has been picked up by that listener.
 // Will react to a 'quit' by writing it and then returning.
 void engine_run() {
+    // Get the machine data before starting stockfish.
+    log_output("Getting machine data.\n");
+    engine_get_machine_data();
+
+    log_output("Starting engine program.\n");
+    string command = engine_configuration_global.executable_path + "\n";
+    ssh_write(command);
+    if (engine_configuration_global.uci_output.find("RamLimitMb") != string::npos) {
+        ssh_write("setoption name RamLimitMb value " + to_string(engine_configuration_global.hash) + "\n");
+    }
+    // Starting engine
     if (!send_all_commands()) {
         return;
     }
@@ -83,13 +96,12 @@ void engine_run() {
 
     // Engine should be running now. No duplicate startup output to trip up chessbase should be in the cache either.
     // Forever: Pipe forward data from engine to cout, and send commands the other way
+    log_output("Starting run of main-loop.\n");
     while(true) {
         output = ssh_read();
         if (!output.empty()) {
-            uci_commands_mutex.lock();
             log_output("Transmitting to CB: " + string(output));
             cout << output << endl;
-            uci_commands_mutex.unlock();
         }
         if (!send_all_commands()) {
             return;
