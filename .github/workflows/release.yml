@@ -57,7 +57,7 @@ jobs:
       # Note: if the preset misses the "configuration", it is possible to explicitly select the
       # configuration with the additional `--config` flag, e.g.:
       #   buildPreset: 'ninja-vcpkg'
-      #   buildPresetAdditionalArgs: "[`--config`, `Release`]"
+          buildPresetAdditionalArgs: "[`--config`, `Release`]"
       #   testPreset: 'ninja-vcpkg'
       #   testPresetAdditionalArgs: "[`--config`, `Release`]"
       - name: Run CMake+vcpkg+Ninja to build.
@@ -75,20 +75,24 @@ jobs:
           vcpkg: true
       #Creating release folder
       - name: Create release-folder
-        run: 
-          cmake --build build &&
+        run:
+          cd build && 
+          cmake -DCMAKE_BUILD_TYPE=Release .. &&
+          cmake --build . --config Release && cd .. &&
           mkdir release &&
           copy build\gcloud_engine.exe release &&
           copy build\gcloud_config.exe release &&
           copy build\ssh.dll release &&
-          copy build\yaml-cppd.dll release &&
+          copy build\yaml-cpp.dll release &&
           copy build\libcrypto-3-x64.dll release &&
           copy foss_engines.yml release &&
           copy LICENSE release &&
           copy README.md release &&
-          compress-archive release -Destinationpath release.zip
+          compress-archive release -Destinationpath release.zip &&
+          compress-archive build -Destinationpath build.zip
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: release.zip
+          artifacts: 
+            "release.zip, build.zip"
 
 
