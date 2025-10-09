@@ -7,11 +7,33 @@ This is inspired by ssh-engine by Matt Plays Chess, https://gitlab.com/matt-play
 
 This work will on itself boot up and shut down google compute engine machines when the engine is loaded and closed, as well as automatically read out how many CPU-cores and how much memory is in the machine, as well as automatically generate ssh-keys for a stable and secure connection.
 
+## Disadvantages
+
+- Hard-to-track pricing scheme. While prices are competitive, it is a bit of work to figure out what you're actually paying. All prices are without VAT.
+
+- Your engine may be kicked off by Google, if customers willing to pay more requests the computational power.
+
+- Ongoing storage costs even if not in use - however at a level of 0.5$/month for a stockfish machine.
+
+- Lots of mails. Every time a Terms & Condition is changed, or a new instance needs to be set up.
+
+- A little bit of effort to set up.
+
+## Advantages
+
+- It's cheap.
+
+- Not bogged down during olympiads.
+
+- No faking of engine performance.
+
+- Ability to setup engine parameters of your choosing.
+
+- Automatic on/off of cloud engine when loaded in chessbase.
+
 ## Motivation
 
 Google compute engine is an online service providing virtual machines with rolling billing, with the possibility to get some exceptionally strong computers. This piece of software aims to serve as an intermediate layer between the compute engine virtual machines and chessbase, as a potential replacement or supplement of the chessbase cloud engines.
-
-By using the google compute engine, it is also possible to control all engine parameters yourself, and avoiding heavy load on chessbase cloud during big events.
 
 Spot VMs
 --------
