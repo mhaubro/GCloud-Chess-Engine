@@ -77,8 +77,8 @@ jobs:
       - name: Create release-folder
         run:
           cd build && 
-          cmake -DCMAKE_BUILD_TYPE=Release .. &&
-          cmake --build . --config Release && cd .. &&
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. &&
+          cmake --build . --config RelWithDebInfo && cd .. &&
           mkdir release &&
           copy build\gcloud_engine.exe release &&
           copy build\gcloud_config.exe release &&

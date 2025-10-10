@@ -143,7 +143,7 @@ The engine.yml file next to the engine is what contains the settings. However, i
 Building
 ------------
 
-Building for windows requires ninja, cmake and the MSVC compilers installed already. The commands for building are as follows executed from the visual studio developer command prompt.
+Building for windows requires ninja, a regular cmake install not using Visual Studio and the MSVC compilers installed already. The commands for building are as follows executed from the visual studio developer command prompt. Note: When installing Visual Studio insiders C++ tools for MSVC, it comes bundled with Visual Studio CMake. This may conflict with the regular CMAKE in the path, and give errors indicating that it cannot find Ninja. To fix, remove CMake using the visual studio installer.
 
 - cmake --preset=vcpkg
 - cmake --build build
