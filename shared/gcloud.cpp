@@ -14,7 +14,13 @@ void gcloud_cache_settings(string gcloud_instance, string gcloud_zone) {
 }
 
 string gcloud_instance_start() {
-    return os_execute_local_shell_command(gcloud_command_name + " compute instances start " + instance + " --zone=" + zone);
+    string output = os_execute_local_shell_command(gcloud_command_name + " compute instances start " + instance + " --zone=" + zone);
+    if (output.find("ERROR: (gcloud.compute.instances.start) You do not currently have an active account selected") != string::npos) {
+        // Do a login before starting. Should be a one-time thing, but catching it here is reasonable.
+        os_execute_local_shell_command(gcloud_command_name + " auth login");
+        output = os_execute_local_shell_command(gcloud_command_name + " compute instances start " + instance + " --zone=" + zone);
+    }
+    return output;
 }
 
 string gcloud_terminate_instance() {
