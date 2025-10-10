@@ -52,7 +52,6 @@ void engine_command_listener() {
             previous_command_stop = true;
             uci_commands_mutex.unlock();
             signal_main_thread();
-            return;
         } else if (line.compare(0, string("quit").length(), string("quit")) == 0) {
             if (previous_command_stop || !main_thread_signaled) {
                 quit_received = true;
