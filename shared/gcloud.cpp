@@ -13,6 +13,10 @@ void gcloud_cache_settings(string gcloud_instance, string gcloud_zone) {
     zone = gcloud_zone;
 }
 
+void gcloud_set_project_id(string project_id) {
+    os_execute_local_shell_command(gcloud_command_name + " config set project " + project_id);
+}
+
 string gcloud_instance_start() {
     string output = os_execute_local_shell_command(gcloud_command_name + " compute instances start " + instance + " --zone=" + zone);
     if (output.find("ERROR: (gcloud.compute.instances.start) You do not currently have an active account selected") != string::npos) {

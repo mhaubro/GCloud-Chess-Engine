@@ -10,6 +10,7 @@ string ssh_get_private_key_filename();
 int ssh_connection_start();
 void ssh_connection_terminate();
 void gcloud_cache_settings(string gcloud_instance, string gcloud_zone);
+void gcloud_set_project_id(string project_id);
 string gcloud_instance_start();
 string gcloud_execute_dummy_command();
 string gcloud_execute_command(string command);
