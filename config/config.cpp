@@ -26,7 +26,16 @@ public:
 
 void Engineconfig::setup_remote_engine() {
     gcloud_cache_settings(instance_name, zone);
-    gcloud_instance_start();
+    string output = gcloud_instance_start();
+    if (output.find("ERROR: (gcloud.compute.instances.start) The required property [project] is not currently set") != string::npos) {
+        // Ask user to set project.
+        cout << "Set the project ID for your gcloud instance" << endl;
+        string project_id;
+        getline(cin, project_id);
+        os_execute_local_shell_command(gcloud_command_name + " config set project " + project_id);
+        gcloud_instance_start();
+    }
+
     gcloud_execute_dummy_command();
     ssh_connection_start();
     // Will block until done
