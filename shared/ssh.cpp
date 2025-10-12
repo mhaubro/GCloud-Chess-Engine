@@ -17,7 +17,6 @@ char ssh_incoming_buffer[512*1024];
 // Assumes that gcloud machine is online -> that gcloud_instance_start has been called beforehand
 int ssh_connection_start() {
     ssh_init();
-    gcloud_execute_dummy_command();
     int status;
     session = ssh_new();
     if (session == NULL) {

@@ -25,10 +25,6 @@ void signal_main_thread() {
     }
 }
 
-// CB sometimes sends erratic quits. If the previous command has not been a
-// 'stop' and the remote engine has been started, ignore the quit and stay alive.
-static bool previous_command_stop = false;
-
 // Thread to be started on program boot. Will always listen to cin, and
 // Reply to the commands 'uci' and 'readyok' immediately.
 // Will put all commands in a list, which can then be consumed by the engine
@@ -40,30 +36,24 @@ void engine_command_listener() {
 
         // If it's a "uci" or "isready", it is not added to command list, instead reply is immediate
         if (line.compare(0, string("uci").length(), string("uci")) == 0) {
-            previous_command_stop = false;
             log_output("Outputting on cout: " + engine_configuration_global.uci_output + "\n");
             cout << engine_configuration_global.uci_output << endl;
         } else if (line.compare(0, string("isready").length(), string("isready")) == 0) {
-            previous_command_stop = false;
             log_output("Outputting on cout: readyok\n");
             cout << "readyok" << endl;
-            signal_main_thread();
-        } else if (line.compare(0, string("stop").length(), string("stop")) == 0) {
-            previous_command_stop = true;
+        } else if (line.compare(0, string("go infinite").length(), string("go infinite")) == 0) {
+            // Analysis have started, so we boot up remote engine.
+            uci_commands_incoming.push_back(line);
             uci_commands_mutex.unlock();
             signal_main_thread();
         } else if (line.compare(0, string("quit").length(), string("quit")) == 0) {
-            if (previous_command_stop || !main_thread_signaled) {
-                quit_received = true;
-                uci_commands_incoming.push_back(line);
-                uci_commands_mutex.unlock();
-                signal_main_thread();
-                return;
-            }
-        } else {
-            previous_command_stop = false;
-            // Add command to command list
+            quit_received = true;
+            uci_commands_incoming.push_back(line);
+            uci_commands_mutex.unlock();
             signal_main_thread();
+            return;
+        } else {
+            // Add command to command list
             uci_commands_incoming.push_back(line);
         }
         uci_commands_mutex.unlock();
