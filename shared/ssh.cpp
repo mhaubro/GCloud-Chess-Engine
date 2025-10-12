@@ -88,8 +88,16 @@ int ssh_connection_start() {
         log_output("SSH shell request failed. Status: " + status + string("\n"));
         return status;
     }
+
     // Discard the boot-text
+    string output = ssh_read();
+    while (output.empty()) {
+        sleep_ms(100);
+        output = ssh_read();
+    }
+    sleep_ms(1000);
     ssh_read();
+
     return SSH_OK;
 }
 
