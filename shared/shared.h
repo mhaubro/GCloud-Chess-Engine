@@ -23,6 +23,20 @@ void log_output(string data);
 string os_execute_local_shell_command(string cmd);
 void sleep_ms(int ms);
 
+class gcloud_ssh_connection {
+    private:
+        ssh_session session;
+        ssh_channel channel;
+        ssh_key privatekey;
+        int verbosity = SSH_LOG_PROTOCOL;
+        int port = 22;
+        char ssh_incoming_buffer[512*1024];
+
+    public:
+        gcloud_ssh_connection(string ip_address);
+        void start
+};
+
 extern string os_path_separator;
 
 #endif // SHARED_H

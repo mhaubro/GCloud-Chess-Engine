@@ -6,13 +6,6 @@
 
 using namespace std;
 
-ssh_session session;
-ssh_channel channel;
-ssh_key privatekey;
-int verbosity = SSH_LOG_PROTOCOL;
-int port = 22;
-char ssh_incoming_buffer[512*1024];
-
 // Setting up session according to https://api.libssh.org/stable/libssh_tutor_guided_tour.html
 // Assumes that gcloud machine is online -> that gcloud_instance_start has been called beforehand
 int ssh_connection_start() {
