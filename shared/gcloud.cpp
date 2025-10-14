@@ -36,6 +36,7 @@ string gcloud_get_ip_address() {
 }
 
 string gcloud_execute_command(string command) {
+    create_folder_if_missing(ssh_get_private_key_folder());
     return os_execute_local_shell_command(gcloud_command_name + " compute ssh " + instance + " --zone=" + zone + " --command=\"" + command + "\"");
 }
 

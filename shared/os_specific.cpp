@@ -11,8 +11,12 @@ static string getUserName() {
     return string(user);
 }
 
+string ssh_get_private_key_folder() {
+    return "C:\\Users\\" + getUserName() + "\\.ssh";
+}
+
 string ssh_get_private_key_filename() {
-    return "C:\\Users\\" + getUserName() + "\\.ssh\\google_compute_engine";
+    return ssh_get_private_key_folder() + "\\google_compute_engine";
 }
 
 // Necessary to invoke .bat-file, as MS createProcess self-appends .exe to the executable with no file ending.

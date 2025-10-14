@@ -6,6 +6,8 @@ using namespace std;
 
 string file_get_parent_folder_path();
 string file_get_parent_folder_name();
+void create_folder_if_missing(string path);
+string ssh_get_private_key_folder();
 string ssh_get_private_key_filename();
 int ssh_connection_start();
 void ssh_connection_terminate();

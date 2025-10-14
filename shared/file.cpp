@@ -15,6 +15,12 @@ string file_get_parent_folder_path() {
     return filesystem::path(os_get_path_to_executable()).parent_path().string();
 }
 
+void create_folder_if_missing(string path) {
+    if (!filesystem::exists(path)) {
+        filesystem::create_directories(path);
+    }
+}
+
 string file_get_parent_folder_name() {
     return filesystem::path(file_get_parent_folder_path()).filename().string();
 }
