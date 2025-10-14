@@ -29,6 +29,7 @@ void Engineconfig::setup_remote_engine() {
     string output = gcloud_instance_start();
     if (output.find("ERROR") != string::npos && output.find("gcloud auth login") != string::npos) {
         // Run gcloud auth login
+        cout << "A browser window for login to will open. Log in and close the browser window to successfully complete the login." << endl;
         os_execute_local_shell_command(gcloud_command_name + " auth login");
         output = gcloud_instance_start();
     }
