@@ -24,6 +24,8 @@ public:
     void emit_gcloud_config();
 };
 
+extern string gcloud_command_name;
+
 void Engineconfig::setup_remote_engine() {
     gcloud_cache_settings(instance_name, zone);
     string output = gcloud_instance_start();
