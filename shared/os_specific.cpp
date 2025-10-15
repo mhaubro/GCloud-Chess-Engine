@@ -19,14 +19,9 @@
 
 using namespace std;
 
-static string getUserName() {
-    char * user = getenv("username");
-    return string(user);
-}
-
 string ssh_get_private_key_folder() {
     #ifdef _WIN32
-        return "C:\\Users\\" + getUserName() + "\\.ssh";
+        return "C:\\Users\\" + getenv("username") + "\\.ssh";
     #else // Linux
         return "~/.ssh";
     #endif
