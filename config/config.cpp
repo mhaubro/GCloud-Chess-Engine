@@ -110,10 +110,9 @@ void Engineconfig::emit_gcloud_config() {
     }
 
     // For windows: Copy dlls and exe. This should possibly live as OS Specific.
-    log_output("Copying dll's and .exe.\n");
+    log_output("Copying binaries.\n");
     // This is a bit of powershell magic
-    os_execute_local_shell_command("powershell Copy-Item -path \"" + file_get_parent_folder_path() + "\\*\" -include \"*.dll\" -Destination \"" + new_folder_path + "\"");
-    filesystem::copy_file(file_get_parent_folder_path() + "\\gcloud_engine.exe", new_folder_path + "\\gcloud_engine.exe");
+    os_copy_binaries(new_folder_path);
     log_output("Emitting engine.yml\n");
     // Emit yml configuration file
     YAML::Node node;

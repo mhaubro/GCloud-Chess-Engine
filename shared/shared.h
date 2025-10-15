@@ -23,6 +23,7 @@ string ssh_read();
 string ssh_read_blocking();
 void log_output(string data);
 string os_execute_local_shell_command(string cmd);
+void os_copy_binaries(string new_folder_path);
 void sleep_ms(int ms);
 
 extern string os_path_separator;

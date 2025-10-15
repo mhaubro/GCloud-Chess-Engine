@@ -33,8 +33,11 @@ string ssh_get_private_key_filename() {
 
 
 void sleep_ms(int ms) {
-    // Windows ms-sleep
-    sleep(ms);
+    #ifdef _WIN32
+        Sleep(ms);
+    #else
+        sleep(ms);
+    #endif
 }
 
 // Get the full path to the location where the executable is
@@ -50,7 +53,6 @@ string os_get_path_to_executable() {
     #endif
 }
 
-// Below is for execution of system commands with output
 #ifdef _WIN32
 // Converts a string to widestring, format used for executing shell commands on windows
 // Found on Stack Exchange
@@ -67,7 +69,8 @@ static wstring to_wide (const string &multi) {
     return wide;
 }
 
-// Gets the most recent windows error as a string. Used for executing gcloud shell commands and writing errors to log.
+// Gets the most recent windows error as a string.
+// Used for executing gcloud shell commands and writing the process creation error to the logs.
 static string GetLastErrorAsString()
 {
     //Get the error message ID, if any.
@@ -170,6 +173,12 @@ string os_execute_local_shell_command(
     log_output("Returning, data: " + string(strResult));
     return string(strResult);
 } //os_execute_local_shell_command
+
+void os_copy_binaries(string new_folder_path) {
+    os_execute_local_shell_command("powershell Copy-Item -path \"" + file_get_parent_folder_path() + "\\*\" -include \"*.dll\" -Destination \"" + new_folder_path + "\"");
+    filesystem::copy_file(file_get_parent_folder_path() + "\\gcloud_engine.exe", new_folder_path + "\\gcloud_engine.exe");
+}
+
 #else //_WIN32
 
 string os_execute_local_shell_command(string cmd) {
@@ -184,4 +193,10 @@ string os_execute_local_shell_command(string cmd) {
     }
     return result;
 }
+
+void os_copy_binaries(string new_folder_path) {
+    // os_execute_local_shell_command("powershell Copy-Item -path \"" + file_get_parent_folder_path() + "\\*\" -include \"*.dll\" -Destination \"" + new_folder_path + "\"");
+    // filesystem::copy_file(file_get_parent_folder_path() + "\\gcloud_engine.exe", new_folder_path + "\\gcloud_engine.exe");
+}
+
 #endif
