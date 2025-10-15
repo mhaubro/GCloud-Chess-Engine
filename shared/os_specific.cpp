@@ -1,8 +1,21 @@
+#include <array>
+#include <string>
+#include <stdexcept>
+#include <memory>
+#include <cstdio>
+#include <iostream>
+#include "shared.h"
 
+#ifdef _WIN32
 #include <windows.h>
 #include <atlstr.h>
-#include <string>
-#include "shared.h"
+    // Necessary to invoke .bat-file, as MS createProcess self-appends .exe to the executable with no file ending.
+    string gcloud_command_name = "gcloud.cmd";
+    string os_path_separator = "\\";
+#else // _WIN32
+    string gcloud_command_name = "gcloud";
+    string os_path_separator = "/";
+#endif //_WIN32
 
 using namespace std;
 
@@ -12,32 +25,38 @@ static string getUserName() {
 }
 
 string ssh_get_private_key_folder() {
-    return "C:\\Users\\" + getUserName() + "\\.ssh";
+    #ifdef _WIN32
+        return "C:\\Users\\" + getUserName() + "\\.ssh";
+    #else // Linux
+        return "~/.ssh";
+    #endif
 }
 
 string ssh_get_private_key_filename() {
-    return ssh_get_private_key_folder() + "\\google_compute_engine";
+    return ssh_get_private_key_folder() + os_path_separator + "google_compute_engine";
 }
 
-// Necessary to invoke .bat-file, as MS createProcess self-appends .exe to the executable with no file ending.
-string gcloud_command_name = "gcloud.cmd";
-// Backslash on windows, frontslash on unix
-string os_path_separator = "\\";
 
 void sleep_ms(int ms) {
     // Windows ms-sleep
-    Sleep(ms);
+    sleep(ms);
 }
 
 // Get the full path to the location where the executable is
 string os_get_path_to_executable() {
-    // Get full path using Windows API
-    wchar_t buffer[MAX_PATH + 1];
-    GetModuleFileNameW(NULL, &buffer[0], MAX_PATH);
-    wstring ws(buffer);
-    return string(ws.begin(), ws.end());
+    #ifdef _WIN32
+        // Get full path using Windows API
+        wchar_t buffer[MAX_PATH + 1];
+        GetModuleFileNameW(NULL, &buffer[0], MAX_PATH);
+        wstring ws(buffer);
+        return string(ws.begin(), ws.end());
+    #else
+        return string("");
+    #endif
 }
 
+// Below is for execution of system commands with output
+#ifdef _WIN32
 // Converts a string to widestring, format used for executing shell commands on windows
 // Found on Stack Exchange
 static wstring to_wide (const string &multi) {
@@ -156,3 +175,18 @@ string os_execute_local_shell_command(
     log_output("Returning, data: " + string(strResult));
     return string(strResult);
 } //os_execute_local_shell_command
+#else //_WIN32
+
+string os_execute_local_shell_command(string cmd) {
+    array<char, 128> buffer;
+    string result;
+    unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+    if (!pipe) {
+        throw runtime_error("Popen failed");
+    }
+    while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
+        result += buffer.data();
+    }
+    return result;
+}
+#endif

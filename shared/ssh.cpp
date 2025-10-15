@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <libssh/libssh.h> // Cannot coexist with windows.h
 #include "configuration.h"
 #include "shared.h"
