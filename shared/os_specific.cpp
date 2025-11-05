@@ -4,6 +4,7 @@
 #include <memory>
 #include <cstdio>
 #include <iostream>
+#include <filesystem>
 #include "shared.h"
 
 #ifdef _WIN32
@@ -21,7 +22,7 @@ using namespace std;
 
 string ssh_get_private_key_folder() {
     #ifdef _WIN32
-        return "C:\\Users\\" + getenv("username") + "\\.ssh";
+        return string("C:\\Users\\") + getenv("username") + "\\.ssh";
     #else // Linux
         return "~/.ssh";
     #endif

@@ -100,12 +100,12 @@ string ssh_return_first_data_and_empty_buffer() {
         output = ssh_read();
         sleep_ms(200);
     }
+    // Additional read to ensure empty buffer
     string tmp = ssh_read();
     while (tmp.length() == 0) {
         tmp = ssh_read();
         sleep_ms(200);
     }
-     // Additional read to ensure empty buffer
     return output;
 }
 
