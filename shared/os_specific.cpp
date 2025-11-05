@@ -1,3 +1,5 @@
+using namespace std;
+
 #include <array>
 #include <string>
 #include <stdexcept>
@@ -17,8 +19,6 @@
     string gcloud_command_name = "gcloud";
     string os_path_separator = "/";
 #endif //_WIN32
-
-using namespace std;
 
 string ssh_get_private_key_folder() {
     #ifdef _WIN32
