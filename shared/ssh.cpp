@@ -89,9 +89,24 @@ int ssh_connection_start() {
         log_output("SSH shell request failed. Status: " + status + string("\n"));
         return status;
     }
+    ssh_return_first_data_and_empty_buffer();
     // Discard the boot-text
-    ssh_read();
     return SSH_OK;
+}
+
+string ssh_return_first_data_and_empty_buffer() {
+    string output = "";
+    while (output.length() == 0) {
+        output = ssh_read();
+        sleep_ms(200);
+    }
+    string tmp = ssh_read();
+    while (tmp.length() == 0) {
+        tmp = ssh_read();
+        sleep_ms(200);
+    }
+     // Additional read to ensure empty buffer
+    return output;
 }
 
 void ssh_connection_terminate() {

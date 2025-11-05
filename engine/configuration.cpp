@@ -70,11 +70,8 @@ void engine_read_configuration() {
 void engine_get_machine_data() {
     if (engine_configuration_global.cpus == 0) {
         ssh_write("nproc --all\n");
-        string output = ssh_read();
-        while (output.length() == 0) {
-            sleep_ms(200);
-            output = ssh_read();
-        }
+        string output = ssh_return_first_data_and_empty_buffer();
+
         // Reserve 2 CPU cores for OS, ssh etc to not bog down the remote engine
         engine_configuration_global.cpus = stoi(output);
         if (engine_configuration_global.cpus > 2) {
@@ -86,11 +83,7 @@ void engine_get_machine_data() {
     
     if (engine_configuration_global.hash == 0) {
         ssh_write("awk '/MemTotal/{print $2}' /proc/meminfo\n");
-        string output = ssh_read();
-        while (output.length() == 0) {
-            sleep_ms(200);
-            output = ssh_read();
-        }
+        string output = ssh_return_first_data_and_empty_buffer();
 
         engine_configuration_global.hash = stoi(output) / 1024;
         // Reserve 8gb or half of total memory to OS, depending on what is smaller

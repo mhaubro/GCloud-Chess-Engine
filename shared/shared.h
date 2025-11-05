@@ -21,6 +21,7 @@ string gcloud_terminate_instance();
 void ssh_write(string data);
 string ssh_read();
 string ssh_read_blocking();
+string ssh_return_first_data_and_empty_buffer();
 void log_output(string data);
 string os_execute_local_shell_command(string cmd);
 void os_copy_binaries(string new_folder_path);

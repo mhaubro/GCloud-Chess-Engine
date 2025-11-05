@@ -109,16 +109,13 @@ void engine_run() {
     if (!send_all_commands()) {
         return;
     }
-    sleep_ms(1000);
-
-    // Swallow all output from the commands
-    string output = ssh_read();
+    ssh_return_first_data_and_empty_buffer();
 
     // Engine should be running now. No duplicate startup output to trip up chessbase should be in the cache either.
     // Forever: Pipe forward data from engine to cout, and send commands the other way
     log_output("Starting run of main-loop.\n");
     while(true) {
-        output = ssh_read();
+        string output = ssh_read();
         if (!output.empty()) {
             log_output("Transmitting to CB: " + string(output));
             cout << output << endl;
