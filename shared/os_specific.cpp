@@ -1,6 +1,4 @@
-#include <array>
 #include <string>
-#include <memory>
 #include <filesystem>
 #include "shared.h"
 
@@ -11,6 +9,9 @@
     string gcloud_command_name = "gcloud.cmd";
     string os_path_separator = "\\";
 #else // _WIN32
+    #include <array>
+    #include <cstring>
+    #include <memory>
     string gcloud_command_name = "gcloud";
     string os_path_separator = "/";
 #endif //_WIN32
@@ -47,14 +48,19 @@ string os_get_path_to_executable() {
         wstring ws(buffer);
         return string(ws.begin(), ws.end());
     #else
-        return string("");
+        char dest[4096];
+        memset(dest, 0, sizeof(dest)); // readlink does not null terminate!
+        if (readlink("/proc/self/exe", dest, PATH_MAX) == -1) {
+            perror("readlink");
+        }
+        return string(dest);
     #endif
 }
 
 #ifdef _WIN32
 // Converts a string to widestring, format used for executing shell commands on windows
 // Found on Stack Exchange
-static wstring to_wide (const string &multi) {
+static wstring to_wide(const string &multi) {
     wstring wide; wchar_t w; mbstate_t mb {};
     size_t n = 0, len = multi.length () + 1;
     while (auto res = mbrtowc (&w, multi.c_str () + n, len - n, &mb)) {
@@ -193,8 +199,7 @@ string os_execute_local_shell_command(string cmd) {
 }
 
 void os_copy_binaries(string new_folder_path) {
-    // os_execute_local_shell_command("powershell Copy-Item -path \"" + file_get_parent_folder_path() + "\\*\" -include \"*.dll\" -Destination \"" + new_folder_path + "\"");
-    // filesystem::copy_file(file_get_parent_folder_path() + "\\gcloud_engine.exe", new_folder_path + "\\gcloud_engine.exe");
+    os_execute_local_shell_command("cp " + file_get_parent_folder_path() + "/engine " + new_folder_path);
 }
 
 #endif
