@@ -28,7 +28,9 @@ int ssh_connection_start() {
     string ip_address = gcloud_get_ip_address();
     // Pop-back CR and newline for SSHLIB to be able to handle the string
     ip_address.pop_back();
+    #ifdef _WIN32
     ip_address.pop_back();
+    #endif
     status = ssh_options_set(session, SSH_OPTIONS_HOST, ip_address.c_str());
     if (status != SSH_OK) {
         log_output("Setting Host failed with: " + status + string("\n"));

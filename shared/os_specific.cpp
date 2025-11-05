@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <string>
 #include <filesystem>
 #include "shared.h"
@@ -184,17 +185,23 @@ void os_copy_binaries(string new_folder_path) {
 }
 
 #else //_WIN32
+#include <cstdio>
+#include <iostream>
+#include <stdexcept>
 
 string os_execute_local_shell_command(string cmd) {
-    array<char, 128> buffer;
+    log_output("Executing command: " + cmd + "\n");
+    string command = "bash " + cmd;
+    array<char, 1024> buffer;
     string result;
-    unique_ptr<FILE, decltype(&pclose)> pipe(popen(cmd.c_str(), "r"), pclose);
+    unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
     if (!pipe) {
         throw runtime_error("Popen failed");
     }
     while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
         result += buffer.data();
     }
+    log_output("Returning, data: " + result + "\n");
     return result;
 }
 
