@@ -1,5 +1,6 @@
-#include <stdint.h>
+#include <chrono>
 #include <string>
+#include <thread>
 #include <filesystem>
 #include "shared.h"
 
@@ -31,13 +32,8 @@ string ssh_get_private_key_filename() {
     return ssh_get_private_key_folder() + os_path_separator + "google_compute_engine";
 }
 
-
 void sleep_ms(int ms) {
-    #ifdef _WIN32
-        Sleep(ms);
-    #else
-        sleep(ms);
-    #endif
+    std::this_thread::sleep_for(std::chrono::milliseconds(ms));
 }
 
 // Get the full path to the location where the executable is
@@ -190,11 +186,16 @@ void os_copy_binaries(string new_folder_path) {
 #include <stdexcept>
 
 string os_execute_local_shell_command(string cmd) {
+
     log_output("Executing command: " + cmd + "\n");
-    string command = "bash " + cmd;
     array<char, 1024> buffer;
     string result;
-    unique_ptr<FILE, decltype(&pclose)> pipe(popen(command.c_str(), "r"), pclose);
+    std::unique_ptr<FILE, void(*)(FILE*)> pipe(popen(cmd.c_str(), "r"),
+    [](FILE * f) -> void
+    {
+        // wrapper to ignore the return value from pclose() is needed with newer versions of gnu g++
+        std::ignore = pclose(f);
+    });
     if (!pipe) {
         throw runtime_error("Popen failed");
     }

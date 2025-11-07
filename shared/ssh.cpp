@@ -28,9 +28,7 @@ int ssh_connection_start() {
     string ip_address = gcloud_get_ip_address();
     // Pop-back CR and newline for SSHLIB to be able to handle the string
     ip_address.pop_back();
-    #ifdef _WIN32
     ip_address.pop_back();
-    #endif
     status = ssh_options_set(session, SSH_OPTIONS_HOST, ip_address.c_str());
     if (status != SSH_OK) {
         log_output("Setting Host failed with: " + status + string("\n"));
@@ -102,9 +100,11 @@ string ssh_return_first_data_and_empty_buffer() {
         output = ssh_read();
         sleep_ms(200);
     }
+    log_output("Returning first data: " + output);
     // Additional read to ensure empty buffer
     string tmp = ssh_read();
-    while (tmp.length() == 0) {
+    while (tmp.length() != 0) {
+        log_output("Discarding data first data: " + tmp);
         tmp = ssh_read();
         sleep_ms(200);
     }

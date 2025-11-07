@@ -32,7 +32,12 @@ string gcloud_terminate_instance() {
 }
 
 string gcloud_get_ip_address() {
-	return os_execute_local_shell_command(gcloud_command_name + " compute instances describe " + instance + " --zone=" + zone + " --format=get(networkInterfaces[0].accessConfigs.natIP)");
+    #ifdef _WIN32
+    string ip_format = " --format=get(networkInterfaces[0].accessConfigs.natIP)";
+    #else
+    string ip_format = " --format='get(networkInterfaces[0].accessConfigs.natIP)'";
+    #endif
+	return os_execute_local_shell_command(gcloud_command_name + " compute instances describe " + instance + " --zone=" + zone + ip_format);
 }
 
 string gcloud_execute_command(string command) {

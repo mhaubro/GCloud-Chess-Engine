@@ -46,7 +46,6 @@ void Engineconfig::setup_remote_engine() {
     }
 
     gcloud_execute_dummy_command();
-    ssh_connection_start();
     // Will block until done
     cout << "Executing " << to_string(setup_commands.size()) << " setup commands" << endl;
     for (unsigned int i = 0; i < setup_commands.size(); i++) {
@@ -55,9 +54,7 @@ void Engineconfig::setup_remote_engine() {
         if (output.find("reboot") != string::npos) {
             cout << "Compute engine machine is rebooting. Waiting " << endl;
             // A reboot is imminent, so sleep for 60s and reconnect over ssh.
-            ssh_connection_terminate();
             sleep_ms(90 * 1000);
-            ssh_connection_start();
         }
     }
     if (neural_nets.size() > 0) {
@@ -70,6 +67,7 @@ void Engineconfig::setup_remote_engine() {
 }
 
 void Engineconfig::get_uci_output() {
+    ssh_connection_start();
     ssh_write(executable_path + "\n");
     // Swallow all output from the commands
     sleep_ms(1500);
