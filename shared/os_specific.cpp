@@ -2,15 +2,16 @@
 #include <string>
 #include <thread>
 #include <filesystem>
-#include "shared.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #include <atlstr.h>
+    using namespace std;
     // Necessary to invoke .bat-file, as MS createProcess self-appends .exe to the executable with no file ending.
     string gcloud_command_name = "gcloud.cmd";
     string os_path_separator = "\\";
 #else // _WIN32
+    using namespace std;
     #include <array>
     #include <cstring>
     #include <memory>
@@ -18,7 +19,7 @@
     string os_path_separator = "/";
 #endif //_WIN32
 
-using namespace std;
+#include "shared.h"
 
 string ssh_get_private_key_folder() {
     #ifdef _WIN32

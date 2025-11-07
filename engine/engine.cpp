@@ -44,7 +44,6 @@ void engine_command_listener() {
         } else if (line.compare(0, string("go infinite").length(), string("go infinite")) == 0) {
             // Analysis have started, so we boot up remote engine.
             uci_commands_incoming.push_back(line);
-            uci_commands_mutex.unlock();
             signal_main_thread();
         } else if (line.compare(0, string("quit").length(), string("quit")) == 0) {
             quit_received = true;
