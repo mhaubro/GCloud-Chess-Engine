@@ -177,7 +177,17 @@ string os_execute_local_shell_command(
 } //os_execute_local_shell_command
 
 void os_copy_binaries(string new_folder_path) {
-    os_execute_local_shell_command("powershell Copy-Item -path \"" + file_get_parent_folder_path() + "\\*\" -include \"*.dll\" -Destination \"" + new_folder_path + "\"");
+    // Naively copy all .dlls in root directory to engine subdirectory
+    for (const auto& entry : filesystem::directory_iterator(file_get_parent_folder_path())) {
+        if (entry.is_regular_file() && entry.path().extension() == ".dll") {
+            std::error_code ec;
+            filesystem::copy_file(entry.path(), new_folder_path + "\\" + entry.path().filename().string(), filesystem::copy_options::overwrite_existing, ec);
+            if (ec) {
+                log_output("Failed to copy. Error-msg: " + ec.message());
+            }
+        }
+    }
+    
     filesystem::copy_file(file_get_parent_folder_path() + "\\gcloud_engine.exe", new_folder_path + "\\gcloud_engine.exe");
 }
 
