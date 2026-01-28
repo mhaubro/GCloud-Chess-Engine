@@ -218,7 +218,8 @@ string os_execute_local_shell_command(string cmd) {
 }
 
 void os_copy_binaries(string new_folder_path) {
-    os_execute_local_shell_command("cp " + file_get_parent_folder_path() + "/engine " + new_folder_path);
+os_execute_local_shell_command("mkdir -p " + file_get_parent_folder_path() + "/" + new_folder_path);
+    os_execute_local_shell_command("cp " + file_get_parent_folder_path() + "/gcloud_engine " + new_folder_path);
 }
 
 #endif
