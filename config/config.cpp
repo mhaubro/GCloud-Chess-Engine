@@ -19,7 +19,7 @@ public:
 
     string toString();
     void setup_remote_engine();
-    void get_uci_output();
+    bool get_uci_output();
     bool check_gcloud_engine_subdirectory();
     void emit_gcloud_config();
 };
@@ -45,7 +45,16 @@ void Engineconfig::setup_remote_engine() {
         gcloud_instance_start();
     }
 
-    gcloud_execute_dummy_command();
+sleep_ms(20 * 1000);
+    output = gcloud_execute_dummy_command();
+    double timeout_seconds = 30;
+    auto start = chrono::system_clock::now();
+    chrono::duration<double> elapsed_seconds = chrono::system_clock::now() - start;
+    while (output.find("ERROR") != string::npos && elapsed_seconds.count() < timeout_seconds) {
+        output = gcloud_execute_dummy_command();
+elapsed_seconds = chrono::system_clock::now() - start;
+    }
+
     // Will block until done
     cout << "Executing " << to_string(setup_commands.size()) << " setup commands" << endl;
     for (unsigned int i = 0; i < setup_commands.size(); i++) {
@@ -60,14 +69,19 @@ void Engineconfig::setup_remote_engine() {
     if (neural_nets.size() > 0) {
         gcloud_execute_command("cd ~"); // Ensure location is home directory
         for (unsigned int i = 0; i < neural_nets.size(); i++) {
-            cout << "Downloading neural network " << to_string(i) << " out of " << to_string(neural_nets.size()) << " in total" << endl;
+            cout << "Downloading neural network " << to_string(i + 1) << " out of " << to_string(neural_nets.size()) << " in total" << endl;
             gcloud_execute_command("wget " + neural_nets[i]);
         }
     }
 }
 
-void Engineconfig::get_uci_output() {
-    ssh_connection_start();
+bool Engineconfig::get_uci_output() {
+int status = ssh_connection_start();
+if (status != 0) {
+        cerr << "Error occurred starting ssh connection. Got status: " + to_string(status) << endl;
+        gcloud_terminate_instance();
+        return false;
+    }
     ssh_write(executable_path + "\n");
     // Swallow all output from the commands
     sleep_ms(1500);
@@ -84,6 +98,7 @@ void Engineconfig::get_uci_output() {
         sleep_ms(100);
         data_read = ssh_read();
     } while (uci_output.find("uciok") == string::npos);
+return true;
 }
 
 bool Engineconfig::check_gcloud_engine_subdirectory() {
@@ -197,8 +212,10 @@ void create_engine() {
         return;
     }
     engine_for_setup.setup_remote_engine();
-    engine_for_setup.get_uci_output();
+bool status =     engine_for_setup.get_uci_output();
+if (status) {
     engine_for_setup.emit_gcloud_config();
+}
     cout << "Setup of engine completed. Enter any input to terminate.\n";
     gcloud_terminate_instance();
     getline(cin, line);
