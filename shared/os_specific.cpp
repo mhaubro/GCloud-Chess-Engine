@@ -25,7 +25,7 @@ string ssh_get_private_key_folder() {
     #ifdef _WIN32
         return string("C:\\Users\\") + getenv("username") + "\\.ssh";
     #else // Linux
-        return "~/.ssh";
+        return string("/home/") + string(getenv("USER")) + string("/.ssh");
     #endif
 }
 
