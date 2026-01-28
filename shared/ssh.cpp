@@ -26,9 +26,10 @@ int ssh_connection_start() {
     }
     // Get the IP Address of the remote machine.
     string ip_address = gcloud_get_ip_address();
-    // Pop-back CR and newline for SSHLIB to be able to handle the string
-    ip_address.pop_back();
-    ip_address.pop_back();
+    // Newline for SSHLIB to be able to handle the string
+    while (ip_address.back() == '\n' || ip_address.back() == '\r') {
+        ip_address.pop_back();
+    }
     status = ssh_options_set(session, SSH_OPTIONS_HOST, ip_address.c_str());
     if (status != SSH_OK) {
         log_output("Setting Host failed with: " + status + string("\n"));
