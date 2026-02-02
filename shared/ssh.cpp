@@ -13,6 +13,7 @@ ssh_key privatekey;
 int verbosity = SSH_LOG_PROTOCOL;
 int port = 22;
 char ssh_incoming_buffer[512*1024];
+extern string ssh_username; // Defined in gcloud.cpp - determined on first execution
 
 // Setting up session according to https://api.libssh.org/stable/libssh_tutor_guided_tour.html
 // Assumes that gcloud machine is online -> that gcloud_instance_start has been called beforehand
@@ -38,6 +39,9 @@ int ssh_connection_start() {
     ssh_options_set(session, SSH_OPTIONS_LOG_VERBOSITY, &verbosity);
     ssh_options_set(session, SSH_OPTIONS_PORT, &port);
     ssh_options_set(session, SSH_OPTIONS_PUBLICKEY_ACCEPTED_TYPES, "rsa-sha2-256,rsa-sha2-512,ecdh-sha2-nistp256,ssh-rsa");
+    if (ssh_username != "") {
+        ssh_options_set(session, SSH_OPTIONS_USER, ssh_username.c_str());
+    }
 
     // This will attempt authentication using all private keys in ~/.ssh
     string private_key_file = ssh_get_private_key_filename();
