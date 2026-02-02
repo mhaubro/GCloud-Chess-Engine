@@ -92,7 +92,7 @@ There's a few of steps involved in setting up a gcloud VM. All of the steps have
 
 - 3: You'll now get a list of possible machines. Not all machines are available in all regions. A good starting point could be the N2D-machine type with the preset highcpu. Choose the number of CPU-cores you want. For Lc0, choose a 'GPU'-machine, for example with an nVidia L4 graphics card. Note that Lc0 in this system currently only supports running on one graphics card at a time. Note: An example of a Lc0-machine can be seen in screenshot 17.
 
-- 3.5: If the machine is a big machine, you will have to adjust your 'quota'. This is the upper limit of how big machines you can use. If there's a "You might not have enough quota"-warning in step 3, click the "request quota adjustment". For each quota adjustment request and approval you will get a mail. The adjustment should go through in 1-2 minutes. Note: It is beneficial to wait with this until the final 'zone' is chosen for the VM in step 9.
+- 3.5: If the machine is a big machine, you will have to adjust your 'quota'. This is the upper limit of how big machines you can use. If there's a "You might not have enough quota"-warning in step 3, click the "request quota adjustment". For each quota adjustment request and approval you will get a mail. The adjustment should go through in 1-2 minutes. Note: It is beneficial to wait with this until the final 'zone' is chosen for the VM in step 9. It has been seen that on new accounts to google compute engine, a high quota can't be requested immediately, and there will be some waiting time before strong virtual machines are available.
 
 - 4: In the sidebar, click on 'Data Protection' and choose 'No Backups'. This will reduce costs.
 
@@ -100,7 +100,7 @@ There's a few of steps involved in setting up a gcloud VM. All of the steps have
 
 - 6: In the sidebar, click on 'Observability', and remove the checkmark on 'Install ops agent'.
 
-- 7: In the sidebar, click on 'Advanced', and choose the provisioning model 'Spot'. This will drastically reduce the price.
+- 7: Head back to the 'Machine Configuration' page, and in the bottom, change the provisioning model to 'Spot'. Note: The screenshot for this step is outdated, as it used to under advanced settings.
 
 - 8: Add a checkmark on 'Set a time limit for the VM', and choose how long the upper limit is. This will mean that the engine will disconnect after the given amount of hours, but also limit how much you time you will pay for if you forget the machine overnight, or if there's any software-bugs in this tool meaning the machine doesn't turn down gracefully, or in the case of a computer-crash. While optional, this is highly recommended.
 
