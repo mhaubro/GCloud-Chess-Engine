@@ -1,12 +1,13 @@
 engines:
   - name: Stockfish-latest
-    executable_path: stockfish/stockfish-ubuntu-x86-64-avx2
+    executable_path: /home/shared/stockfish/stockfish-ubuntu-x86-64-avx2
     setup:
-      - rm -rf ~/*
-      - wget https://github.com/official-stockfish/Stockfish/releases/latest/download/stockfish-ubuntu-x86-64-avx2.tar
-      - tar -xvf stockfish-ubuntu-x86-64-avx2.tar
+      - rm -rf /home/shared/*
+      - sudo mkdir -p /home/shared/ && sudo chmod 777 /home/shared/
+      - cd /home/shared/ && wget https://github.com/official-stockfish/Stockfish/releases/latest/download/stockfish-ubuntu-x86-64-avx2.tar
+      - cd /home/shared/ && tar -xvf stockfish-ubuntu-x86-64-avx2.tar
   - name: lc0-0.32
-    executable_path: lc0/build/release/lc0
+    executable_path: /home/shared/lc0/build/release/lc0
     neural_nets: # List of recommended NNs from https://lczero.org/play/networks/bestnets/, 7/10-25
         # All of these will be downloaded and located in the users home directory for ease of choosing network.
         # Users can also later download networks themselves, should they so choose.
@@ -21,7 +22,8 @@ engines:
       - https://storage.lczero.org/files/networks-contrib/t1-256x10-distilled-swa-2432500.pb.gz
     setup:
         #This is rather painful, and potentially vulnerable to both updates to Debian, Nvidia and Lc0.
-      - rm -rf ~/*
+      - sudo rm -rf /home/shared/*
+      - sudo mkdir -p /home/shared/ && sudo chmod 777 /home/shared/
         #Avoid a popup requesting choice of country for keyboard
       - sudo DEBIAN_FRONTEND=noninteractive
       - sudo apt-get update
@@ -40,9 +42,9 @@ engines:
       - sudo apt-get -y install cudnn
         # Build of Lc0 according to https://github.com/LeelaChessZero/lc0
       - sudo apt-get -y install git python3-pip gcc g++ zlib1g zlib1g-dev ninja-build meson
-      - git clone -b release/0.32 https://github.com/LeelaChessZero/lc0.git
-      - cd lc0 && INSTALL_PREFIX=~/.local ./build.sh
+      - cd /home/shared/ && git clone -b release/0.32 https://github.com/LeelaChessZero/lc0.git
+      - cd /home/shared/lc0 && INSTALL_PREFIX=~/.local ./build.sh
         # Putting the BT4-1740 network will ensure Lc0 always has a network it can load by default.
         # A second copy will be present in the home directory, where the binary is launched from,
         # in case the user sets BT4-1740.pb.gz as the weights file
-      - cd ~/lc0/build/release && wget https://storage.lczero.org/files/networks-contrib/big-transformers/BT4-1740.pb.gz
+      - cd /home/shared/lc0/build/release && wget https://storage.lczero.org/files/networks-contrib/big-transformers/BT4-1740.pb.gz

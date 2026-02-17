@@ -67,7 +67,7 @@ elapsed_seconds = chrono::system_clock::now() - start;
         }
     }
     if (neural_nets.size() > 0) {
-        gcloud_execute_command("cd ~"); // Ensure location is home directory
+        gcloud_execute_command("cd /home/shared"); // Ensure location is home directory
         for (unsigned int i = 0; i < neural_nets.size(); i++) {
             cout << "Downloading neural network " << to_string(i + 1) << " out of " << to_string(neural_nets.size()) << " in total" << endl;
             gcloud_execute_command("wget " + neural_nets[i]);
