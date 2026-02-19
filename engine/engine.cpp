@@ -68,10 +68,10 @@ static bool send_all_commands() {
         uci_commands_mutex.unlock();
 
         if (command.compare(0, setoption_hash_string.length(), setoption_hash_string) == 0) { // Necessary to overwrite the hash value from CB
-            command = setoption_hash_string + to_string(engine_configuration_global.hash);
+            continue;
         }
         if (command.compare(0, setoption_threads_string.length(), setoption_threads_string) == 0) { // Necessary to overwrite the hash value from CB
-            command = setoption_threads_string + to_string(engine_configuration_global.cpus);
+            continue;
         }
         if (command.find("RamLimitMb") != string::npos) { // Ram limit mb is written automatically during startup
             continue;
@@ -103,6 +103,12 @@ void engine_run() {
     ssh_write(command);
     if (engine_configuration_global.uci_output.find("RamLimitMb") != string::npos) {
         ssh_write("setoption name RamLimitMb value " + to_string(engine_configuration_global.hash) + "\n");
+    }
+    if (engine_configuration_global.uci_output.find("Hash") != string::npos) {
+        ssh_write("setoption name Hash value " + to_string(engine_configuration_global.hash) + "\n");
+    }
+    if (engine_configuration_global.uci_output.find("Threads") != string::npos) {
+        ssh_write("setoption name Threads value " + to_string(engine_configuration_global.cpus) + "\n");
     }
     // Starting engine
     if (!send_all_commands()) {
