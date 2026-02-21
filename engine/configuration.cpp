@@ -74,10 +74,13 @@ void engine_get_machine_data() {
 
         // Reserve 2 CPU cores for OS, ssh etc to not bog down the remote engine
         engine_configuration_global.cpus = stoi(output);
-        if (engine_configuration_global.cpus > 2) {
-            engine_configuration_global.cpus -= 2;
-        } else {
-            engine_configuration_global.cpus = 1;
+        if (engine_configuration_global.cpus > 8) {
+            engine_configuration_global.cpus -= 4;
+        } else if (engine_configuration_global.cpus > 4) {
+            engine_configuration_global.cpus = engine_configuration_global.cpus -= 2;
+        }
+        } else if (engine_configuration_global.cpus > 2) {
+            engine_configuration_global.cpus = engine_configuration_global.cpus -= 1;
         }
     }
     
@@ -87,8 +90,8 @@ void engine_get_machine_data() {
 
         engine_configuration_global.hash = stoi(output) / 1024;
         // Reserve 8gb or half of total memory to OS, depending on what is smaller
-        if (engine_configuration_global.hash > 16384) {
-            engine_configuration_global.hash -= 8192;
+        if (engine_configuration_global.hash > 32768) {
+            engine_configuration_global.hash -= 16384;
         } else {
             engine_configuration_global.hash /= 2;
         }
