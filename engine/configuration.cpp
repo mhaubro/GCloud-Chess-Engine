@@ -78,7 +78,6 @@ void engine_get_machine_data() {
             engine_configuration_global.cpus -= 4;
         } else if (engine_configuration_global.cpus > 4) {
             engine_configuration_global.cpus = engine_configuration_global.cpus -= 2;
-        }
         } else if (engine_configuration_global.cpus > 2) {
             engine_configuration_global.cpus = engine_configuration_global.cpus -= 1;
         }
